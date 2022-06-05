@@ -1,16 +1,14 @@
+import { format, parseISO } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import Header from '../components/Header';
+import { useState } from 'react';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 
+import Header from '../components/Header';
 import { getPrismicClient } from '../services/prismic';
-
 import styles from './home.module.scss';
-import { format, parseISO } from 'date-fns';
-import ptBR from 'date-fns/locale/pt-BR';
-import { useState } from 'react';
-import { useAllPrismicDocumentsByType } from '@prismicio/react';
 
 interface Post {
   uid?: string;
@@ -39,13 +37,13 @@ export default function Home({ postsPagination }: HomeProps) {
     fetch(link)
       .then(response => response.json())
       .then(data => {
-        const newPosts = { ...posts };
-
-        setPosts({
-          ...newPosts,
+        const newPosts = {
+          ...posts,
           next_page: data.next_page,
-          results: [...newPosts.results, ...data.results],
-        });
+          results: [...posts.results, ...data.results],
+        };
+
+        setPosts(newPosts);
         setHasNext(!!data.next_page);
       });
   }
@@ -109,16 +107,6 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsResponse = await prismic.getByType('posts', {
     pageSize: 2,
   });
-
-  const posts = postsResponse.results.map(post => ({
-    uid: post.uid,
-    data: {
-      title: post.data.title,
-      subtitle: post.data.subtitle,
-      author: post.data.author,
-    },
-    first_publication_date: post.first_publication_date,
-  }));
 
   const postsPagination = { ...postsResponse };
 

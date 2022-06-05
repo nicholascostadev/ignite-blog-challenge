@@ -87,7 +87,7 @@ export default function Post({ post }: PostProps) {
             </div>
           </div>
           {post.data.content.map(content => (
-            <div className={styles.postContent}>
+            <div className={styles.postContent} key={content.heading}>
               <h2>{content.heading}</h2>
               <PrismicRichText field={content.body as []} />
             </div>
